@@ -25,6 +25,8 @@ const enableLocation = () => {
     navigator.geolocation.getCurrentPosition(
         (position) => {
             status.loading = false;
+            center.lat = position.coords.latitude;
+            center.lng = position.coords.longitude;
             location.lat = position.coords.latitude;
             location.lng = position.coords.longitude;
             location.places = [];
@@ -45,6 +47,11 @@ const findNearBy = async () => {
 
     location.places = res.data.results || [];
     status.search = false;
+};
+
+const setCenter = (location) => {
+    center.lat = location.lat;
+    center.lng = location.lng;
 };
 </script>
 
@@ -71,16 +78,16 @@ const findNearBy = async () => {
                 map-type-id="terrain"
                 class="h-screen w-full"
             >
-                <GMapCluster>
+                <!-- <GMapCluster>
                     <GMapMarker
-                        :key="index"
-                        v-for="(m, index) in location.places"
+                        v-for="m in location.places"
+                        :key="m.place_id"
                         :position="m.geometry.location"
                         :clickable="true"
                         :draggable="true"
                         @click="center = m.geometry.location"
                     />
-                </GMapCluster>
+                </GMapCluster> -->
             </GMapMap>
         </div>
         <div class="container px-5 py-24 mx-auto flex">
@@ -134,9 +141,10 @@ const findNearBy = async () => {
                     </p>
                     <ul class="list-none px-4 max-h-80 overflow-y-scroll">
                         <li
+                            class="border-b border-gray-200 py-2 hover:text-indigo-500 cursor-pointer"
                             v-for="item in location.places"
                             :key="item.place_id"
-                            class="border-b border-gray-200 py-2 hover:text-indigo-500 cursor-pointer"
+                            @click="setCenter(item.geometry.location)"
                         >
                             {{ item.name }}
                         </li>
